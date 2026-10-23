@@ -22,10 +22,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ArmorStandEntityRendererMixin {
 
     @Inject(
-        method = "hasLabel(Lnet/minecraft/entity/decoration/ArmorStandEntity;D)Z",
+        method = "hasLabel(Lnet/minecraft/entity/decoration/ArmorStandEntity;)Z",
         at = @At("HEAD")
     )
-    private void onHasLabel(ArmorStandEntity armorStand, double distance, CallbackInfoReturnable<Boolean> cir) {
+    private void onHasLabel(ArmorStandEntity armorStand, CallbackInfoReturnable<Boolean> cir) {
         if (!PotCounterMod.isModActive()) return;
         PotCounterMod mod = PotCounterMod.getInstance();
         if (mod == null) return;
@@ -52,7 +52,6 @@ public abstract class ArmorStandEntityRendererMixin {
 
         if (!isEligible) return;
 
-        // Only target the line that directly contains the player's name
         if (!NametagHelper.containsPlayerName(armorStand, player.getName().getString())) {
             return;
         }
@@ -63,9 +62,8 @@ public abstract class ArmorStandEntityRendererMixin {
         }
 
         PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
-        // Do not display counter suffix if player has not thrown any pots yet (starts directly from -1)
         if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
-            return;
+            return; // Do not append -0, start directly at -1
         }
 
         MutableText modified = text.copy().append(data.getSuffixText());

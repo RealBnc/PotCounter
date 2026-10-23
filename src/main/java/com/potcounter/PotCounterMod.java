@@ -49,21 +49,13 @@ public class PotCounterMod implements ClientModInitializer {
         this.potTracker = new PotTracker(combatManager, configManager.getConfig());
         this.potDetectionManager = new PotDetectionManager(potTracker, combatManager, soundManager);
 
-        // Native 1.21.11 KeyBinding registration with Category object
+        // Direct 1.21.11 KeyBinding registration without reflection
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.potcounter.open_menu",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
-                KeyBinding.Category.create(Identifier.of("potcounter", "category"))
+                "key.category.potcounter"
         ));
-
-        // Official Fabric API HUD Render Callback (Fully compatible with ImmediatelyFast, Sodium & ModernFix)
-        net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((context, tickCounter) -> {
-            if (!isModActive()) return;
-            if (configManager != null && potTracker != null) {
-                com.potcounter.render.CounterHudRenderer.render(context, potTracker, configManager.getConfig());
-            }
-        });
 
         // Client tick: process key events, combat cleanup, detection queue, and tick rendering cache
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

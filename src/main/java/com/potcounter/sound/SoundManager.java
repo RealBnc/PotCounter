@@ -43,7 +43,7 @@ public class SoundManager {
             // Direct sound event creation - completely avoids registry get method differences across MC versions
             SoundEvent soundEvent = SoundEvent.of(identifier);
             if (soundEvent != null) {
-                client.getSoundManager().play(PositionedSoundInstance.ui(soundEvent, 1.0f, volume));
+                client.getSoundManager().play(PositionedSoundInstance.master(soundEvent, 1.0f, volume));
             }
         } catch (Throwable t) {
             LOGGER.warn("Failed to play sound: {}", soundId, t);

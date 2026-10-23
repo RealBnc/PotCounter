@@ -6,32 +6,34 @@ import com.potcounter.tracker.PotTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 
 import java.util.Map;
 import java.util.UUID;
 
 public class CounterHudRenderer {
+    private static int scrollOffset = 0;
 
     public static void render(DrawContext context, PotTracker tracker, CounterConfig config) {
-        if (config == null || tracker == null || config.getCounterDisplay() != CounterDisplay.MENU) {
+        if (config.getCounterDisplay() != CounterDisplay.MENU) {
             return;
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null || client.player == null || client.world == null) {
+        if (client.player == null || client.world == null) {
             return;
         }
 
         UUID localUuid = client.player.getUuid();
         Map<UUID, Integer> entries = tracker.getActiveEntries(localUuid);
-        if (entries == null || entries.isEmpty()) {
+        if (entries.isEmpty()) {
             return;
         }
 
         int screenWidth = client.getWindow().getScaledWidth();
-        float scale = config.getMenuScale() <= 0.1f ? 1.0f : config.getMenuScale();
-        int baseWidth = Math.max(90, config.getMenuWidth());
-        int baseHeight = Math.max(30, config.getMenuHeight());
+        float scale = config.getMenuScale();
+        int baseWidth = config.getMenuWidth();
+        int baseHeight = config.getMenuHeight();
 
         int x = config.getMenuX();
         int y = config.getMenuY();
@@ -40,17 +42,14 @@ public class CounterHudRenderer {
             // Auto top-right
             x = screenWidth - (int)(baseWidth * scale) - 10;
         }
-        if (y < 0) {
-            y = 10;
-        }
 
         TextRenderer tr = client.textRenderer;
-        int padding = Math.max(2, config.getMenuPadding());
-        int lineSpacing = Math.max(1, config.getMenuLineSpacing());
+        int padding = config.getMenuPadding();
+        int lineSpacing = config.getMenuLineSpacing();
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate((float) x, (float) y);
-        context.getMatrices().scale(scale, scale);
+        context.getMatrices().push();
+        context.getMatrices().translate((double) x, (double) y, 0.0);
+        context.getMatrices().scale(scale, scale, 1.0f);
 
         // Render card relative to 0,0 inside scaled matrix
         int w = baseWidth;
@@ -73,14 +72,12 @@ public class CounterHudRenderer {
             context.fill(w - 1, 0, w, h, border);
         }
 
-        // In 1.21.11, Matrix3x2fStack is 2D
-
         int contentY = padding + 2;
 
         // 3. Header / Title
         if (config.isMenuShowTitle()) {
             String title = "⚡ POTS (" + config.getCounterMode().getDisplayName() + ")";
-            context.drawTextWithShadow(tr, title, padding, contentY, config.getMenuBorderColor());
+            TextHelper.drawText(context, tr, Text.literal(title), padding, contentY, config.getMenuBorderColor());
             contentY += tr.fontHeight + 3;
             // Header divider line
             context.fill(padding, contentY - 1, w - padding, contentY, 0x44FFD54F);
@@ -88,35 +85,54 @@ public class CounterHudRenderer {
         }
 
         int rowHeight = tr.fontHeight + lineSpacing;
+        int availableHeight = h - contentY - padding;
 
-        // 4. Render Active Players & Pot Counts
+        boolean scissorActive = false;
+        try {
+            int screenX = (int)(x);
+            int screenY = (int)(y + contentY * scale);
+            int screenW = (int)(w * scale);
+            int screenH = (int)(availableHeight * scale);
+            context.enableScissor(screenX, screenY, screenX + screenW, screenY + screenH);
+            scissorActive = true;
+        } catch (Throwable ignored) {}
+
+        int currentY = contentY - scrollOffset;
+
         for (Map.Entry<UUID, Integer> entry : entries.entrySet()) {
-            if (contentY + tr.fontHeight > h - padding) {
-                break;
-            }
-
             UUID uuid = entry.getKey();
             int count = entry.getValue();
 
             String name = tracker.getPlayerName(uuid);
-            if (name == null || name.trim().isEmpty()) {
-                name = "Opponent";
-            }
             String countStr = "-" + count;
 
             int potColor = ColorHelper.getPotColor(count, config.isMenuAutoColor(), config.getMenuCustomColor());
 
-            // Draw player name on the left in crisp clean white
-            context.drawTextWithShadow(tr, name, padding, contentY, 0xFFEDEDED);
+            if (currentY + tr.fontHeight >= contentY && currentY <= h - padding) {
+                // Draw player name on the left in crisp clean white
+                TextHelper.drawTextWithShadow(context, tr, Text.literal(name), padding, currentY, 0xFFEDEDED);
 
-            // Draw pot count on the right
-            int countWidth = tr.getWidth(countStr);
-            int countX = w - padding - countWidth;
-            context.drawTextWithShadow(tr, countStr, countX, contentY, potColor | 0xFF000000);
+                // Draw pot count on the right
+                int countWidth = tr.getWidth(countStr);
+                int countX = w - padding - countWidth;
+                TextHelper.drawTextWithShadow(context, tr, Text.literal(countStr), countX, currentY, potColor | 0xFF000000);
+            }
 
-            contentY += rowHeight;
+            currentY += rowHeight;
         }
 
-        context.getMatrices().popMatrix();
+        if (scissorActive) {
+            try {
+                context.disableScissor();
+            } catch (Throwable ignored) {}
+        }
+
+        context.getMatrices().pop();
+    }
+
+    public static void handleScroll(double amount, int totalEntries, int availableHeight, int rowHeight) {
+        int totalHeight = totalEntries * rowHeight;
+        int maxScroll = Math.max(0, totalHeight - availableHeight);
+        scrollOffset = (int) Math.max(0, Math.min(maxScroll, scrollOffset - (amount * 10)));
     }
 }

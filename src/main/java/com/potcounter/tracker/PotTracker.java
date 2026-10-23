@@ -61,7 +61,7 @@ public class PotTracker {
 
     public String getPlayerName(UUID uuid) {
         if (uuid == null) {
-            return "Player";
+            return "Unknown";
         }
 
         String cached = playerNames.get(uuid);
@@ -74,23 +74,17 @@ public class PotTracker {
             if (client.world != null) {
                 PlayerEntity player = client.world.getPlayerByUuid(uuid);
                 if (player != null) {
-                    String name = player.getGameProfile() != null && player.getGameProfile().name() != null
-                            ? player.getGameProfile().name()
-                            : player.getName().getString();
-                    if (name != null && !name.trim().isEmpty()) {
-                        playerNames.put(uuid, name.trim());
-                        return name.trim();
-                    }
+                    String name = player.getName().getString();
+                    playerNames.put(uuid, name);
+                    return name;
                 }
             }
             if (client.getNetworkHandler() != null) {
                 PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(uuid);
-                if (entry != null && entry.getProfile() != null && entry.getProfile().name() != null) {
-                    String name = entry.getProfile().name();
-                    if (name != null && !name.trim().isEmpty()) {
-                        playerNames.put(uuid, name.trim());
-                        return name.trim();
-                    }
+                if (entry != null && entry.getProfile() != null && entry.getProfile().getName() != null) {
+                    String name = entry.getProfile().getName();
+                    playerNames.put(uuid, name);
+                    return name;
                 }
             }
         }
@@ -204,43 +198,10 @@ public class PotTracker {
             return result;
         }
 
-        // SINGLE mode:
+        // SINGLE mode
         UUID activeOpponent = combatManager.getCurrentActiveOpponent();
-        if (activeOpponent == null) {
-            // Fallback 1: check confirmed sessions
-            List<com.potcounter.combat.CombatSession> sessions = combatManager.getConfirmedSessionsForPlayer(localPlayerUuid);
-            for (com.potcounter.combat.CombatSession session : sessions) {
-                UUID opp = session.getPair().getOther(localPlayerUuid);
-                if (opp != null) {
-                    activeOpponent = opp;
-                    break;
-                }
-            }
-        }
-        if (activeOpponent == null) {
-            // Fallback 2: check playerPotCounts
-            for (UUID u : playerPotCounts.keySet()) {
-                if (localPlayerUuid == null || !u.equals(localPlayerUuid)) {
-                    activeOpponent = u;
-                    break;
-                }
-            }
-        }
-        if (activeOpponent == null) {
-            // Fallback 3: check other players in world (if duel arena has 1 other player)
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client != null && client.world != null) {
-                for (PlayerEntity p : client.world.getPlayers()) {
-                    if (localPlayerUuid != null && p.getUuid().equals(localPlayerUuid)) continue;
-                    if (p.isSpectator()) continue;
-                    activeOpponent = p.getUuid();
-                    break;
-                }
-            }
-        }
-
         if (activeOpponent != null) {
-            int count = playerPotCounts.getOrDefault(activeOpponent, 0);
+            int count = getCountForPlayer(activeOpponent, localPlayerUuid);
             if (count > 0) {
                 getPlayerName(activeOpponent);
                 result.put(activeOpponent, count);

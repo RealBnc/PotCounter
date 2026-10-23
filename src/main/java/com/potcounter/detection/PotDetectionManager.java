@@ -15,7 +15,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
+import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -124,14 +124,14 @@ public class PotDetectionManager {
             return;
         }
 
-        Vec3d vel = packet.getVelocity();
+        Vec3d vel = new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
         if (vel == null || (vel.x == 0.0 && vel.y == 0.0 && vel.z == 0.0)) {
             return;
         }
 
         Entity entity = world.getEntityById(entityId);
-        if (entity instanceof ThrownItemEntity thrownItem) {
-            ItemStack stack = thrownItem.getStack();
+        if (entity instanceof PotionEntity splashPotion) {
+            ItemStack stack = splashPotion.getStack();
             if (isHealing2Potion(stack)) {
                 processedPotionEntityIds.add(entityId);
                 resolveAndProcess(packet.getX(), packet.getY(), packet.getZ(), vel, packet.getEntityData(), world);
@@ -163,8 +163,8 @@ public class PotDetectionManager {
 
         if (foundStack == null) {
             Entity entity = world.getEntityById(entityId);
-            if (entity instanceof ThrownItemEntity thrownItem) {
-                foundStack = thrownItem.getStack();
+            if (entity instanceof PotionEntity splash) {
+                foundStack = splash.getStack();
             }
         }
 
