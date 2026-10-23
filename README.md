@@ -70,4 +70,7 @@ Built jars will be output to `build/libs/`.
 ---
 
 ## 📄 License
+Developed by **RealBnc** and **m4ssivee**.
+
 This project is licensed under the MIT License.
+
