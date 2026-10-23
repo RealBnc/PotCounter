@@ -18,22 +18,22 @@ PotCounter strictly requires **[m4lib](https://modrinth.com/mod/m4lib)** to work
 - **Compatibility:** Fully compatible with Sodium, ImmediatelyFast, and ModernFix.
 
 ## 📥 Downloads
-You can download the mod from **[Modrinth](https://modrinth.com/mod/potcounter)** or grab the specific jar for your version below:
+You can download the mod from **[Modrinth](https://modrinth.com/mod/potcounter)** or grab the direct jar for your version below:
 
-| Minecraft Version | GitHub Download | Notes |
+| Minecraft Version | GitHub Direct Download | Notes |
 | :--- | :--- | :--- |
-| **1.21 – 1.21.1** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21-1.21.1].jar) | MatrixStack 3D, classic nametag rendering |
-| **1.21.2 – 1.21.3** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.2-1.21.3].jar) | Bundles update, PlayerEntityRenderState |
-| **1.21.4** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.4].jar) | Pale Garden update, HudRenderCallback |
-| **1.21.5** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.5].jar) | Dedicated 1.21.5 build |
-| **1.21.6** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.6].jar) | RenderPipelines & 2D Matrix3x2fStack |
-| **1.21.7** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.7].jar) | RenderPipelines GUI textures |
-| **1.21.8** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.8].jar) | 1.21.8 Yarn mappings |
-| **1.21.9** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.9].jar) | KeyBinding.Category & Vector velocity |
-| **1.21.10** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.10].jar) | Clean HUD username lookup |
-| **1.21.11** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-[1.21.11].jar) | Native 1.21.11 modern render pipelines |
+| **1.21 – 1.21.1** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21-1.21.1.jar) | MatrixStack 3D, classic nametag rendering |
+| **1.21.2 – 1.21.3** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.2-1.21.3.jar) | Bundles update, PlayerEntityRenderState |
+| **1.21.4** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.4.jar) | Pale Garden update, HudRenderCallback |
+| **1.21.5** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.5.jar) | Dedicated 1.21.5 build |
+| **1.21.6** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.6.jar) | RenderPipelines & 2D Matrix3x2fStack |
+| **1.21.7** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.7.jar) | RenderPipelines GUI textures |
+| **1.21.8** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.8.jar) | 1.21.8 Yarn mappings |
+| **1.21.9** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.9.jar) | KeyBinding.Category & Vector velocity |
+| **1.21.10** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.10.jar) | Clean HUD username lookup |
+| **1.21.11** | [Download](https://github.com/RealBnc/PotCounter/releases/download/v1.0.0/PotCounter-1.21.11.jar) | Native 1.21.11 modern render pipelines |
 
-> All releases are also listed on the **[GitHub Releases Page](https://github.com/RealBnc/PotCounter/releases)**.
+> All compiled files are also available on the **[GitHub Releases Page](https://github.com/RealBnc/PotCounter/releases)**.
 
 ## Source Branches
 Each Minecraft release has its own source branch in this repo:
