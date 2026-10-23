@@ -6,7 +6,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 public class MarkerHelper {
-    public static final ClickEvent POT_MARKER = new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "potcounter_marker");
+    public static final ClickEvent POT_MARKER = new ClickEvent.ChangePage(99999);
 
     public static MutableText mark(MutableText text) {
         if (text == null) return null;
