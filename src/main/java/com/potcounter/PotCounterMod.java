@@ -57,6 +57,14 @@ public class PotCounterMod implements ClientModInitializer {
                 "key.category.potcounter"
         ));
 
+        // Official Fabric API HUD Render Callback (Fully compatible with ImmediatelyFast, Sodium & ModernFix)
+        net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register((context, tickCounter) -> {
+            if (!isModActive()) return;
+            if (configManager != null && potTracker != null) {
+                com.potcounter.render.CounterHudRenderer.render(context, potTracker, configManager.getConfig());
+            }
+        });
+
         // Client tick: process key events, combat cleanup, detection queue, and tick rendering cache
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (configKeyBinding != null) {

@@ -61,7 +61,12 @@ public class PotTracker {
 
     public String getPlayerName(UUID uuid) {
         if (uuid == null) {
-            return "Unknown";
+            return "Player";
+        }
+
+        Text serverCustom = serverCustomNames.get(uuid);
+        if (serverCustom != null && !serverCustom.getString().trim().isEmpty()) {
+            return serverCustom.getString().trim();
         }
 
         String cached = playerNames.get(uuid);
@@ -198,10 +203,43 @@ public class PotTracker {
             return result;
         }
 
-        // SINGLE mode
+        // SINGLE mode:
         UUID activeOpponent = combatManager.getCurrentActiveOpponent();
+        if (activeOpponent == null) {
+            // Fallback 1: check confirmed sessions
+            List<com.potcounter.combat.CombatSession> sessions = combatManager.getConfirmedSessionsForPlayer(localPlayerUuid);
+            for (com.potcounter.combat.CombatSession session : sessions) {
+                UUID opp = session.getPair().getOther(localPlayerUuid);
+                if (opp != null) {
+                    activeOpponent = opp;
+                    break;
+                }
+            }
+        }
+        if (activeOpponent == null) {
+            // Fallback 2: check playerPotCounts
+            for (UUID u : playerPotCounts.keySet()) {
+                if (localPlayerUuid == null || !u.equals(localPlayerUuid)) {
+                    activeOpponent = u;
+                    break;
+                }
+            }
+        }
+        if (activeOpponent == null) {
+            // Fallback 3: check other players in world (if duel arena has 1 other player)
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client != null && client.world != null) {
+                for (PlayerEntity p : client.world.getPlayers()) {
+                    if (localPlayerUuid != null && p.getUuid().equals(localPlayerUuid)) continue;
+                    if (p.isSpectator()) continue;
+                    activeOpponent = p.getUuid();
+                    break;
+                }
+            }
+        }
+
         if (activeOpponent != null) {
-            int count = getCountForPlayer(activeOpponent, localPlayerUuid);
+            int count = playerPotCounts.getOrDefault(activeOpponent, 0);
             if (count > 0) {
                 getPlayerName(activeOpponent);
                 result.put(activeOpponent, count);

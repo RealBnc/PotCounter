@@ -6,7 +6,6 @@ import com.potcounter.tracker.PotTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.util.Map;
 import java.util.UUID;
@@ -74,12 +73,15 @@ public class CounterHudRenderer {
             context.fill(w - 1, 0, w, h, border);
         }
 
+        // Advance Z slightly so text renders strictly in front of background
+        context.getMatrices().translate(0.0, 0.0, 1.0);
+
         int contentY = padding + 2;
 
         // 3. Header / Title
         if (config.isMenuShowTitle()) {
             String title = "⚡ POTS (" + config.getCounterMode().getDisplayName() + ")";
-            TextHelper.drawText(context, tr, Text.literal(title), padding, contentY, config.getMenuBorderColor());
+            context.drawTextWithShadow(tr, title, padding, contentY, config.getMenuBorderColor());
             contentY += tr.fontHeight + 3;
             // Header divider line
             context.fill(padding, contentY - 1, w - padding, contentY, 0x44FFD54F);
@@ -106,12 +108,12 @@ public class CounterHudRenderer {
             int potColor = ColorHelper.getPotColor(count, config.isMenuAutoColor(), config.getMenuCustomColor());
 
             // Draw player name on the left in crisp clean white
-            TextHelper.drawTextWithShadow(context, tr, Text.literal(name), padding, contentY, 0xFFEDEDED);
+            context.drawTextWithShadow(tr, name, padding, contentY, 0xFFEDEDED);
 
             // Draw pot count on the right
             int countWidth = tr.getWidth(countStr);
             int countX = w - padding - countWidth;
-            TextHelper.drawTextWithShadow(context, tr, Text.literal(countStr), countX, contentY, potColor | 0xFF000000);
+            context.drawTextWithShadow(tr, countStr, countX, contentY, potColor | 0xFF000000);
 
             contentY += rowHeight;
         }
