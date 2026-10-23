@@ -49,12 +49,12 @@ public class PotCounterMod implements ClientModInitializer {
         this.potTracker = new PotTracker(combatManager, configManager.getConfig());
         this.potDetectionManager = new PotDetectionManager(potTracker, combatManager, soundManager);
 
-        // Native 1.21.3 KeyBinding registration
+        // Native 1.21.11 KeyBinding registration with Category object
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.potcounter.open_menu",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
-                "key.category.potcounter"
+                KeyBinding.Category.create(Identifier.of("potcounter", "category"))
         ));
 
         // Official Fabric API HUD Render Callback (Fully compatible with ImmediatelyFast, Sodium & ModernFix)

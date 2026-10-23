@@ -74,8 +74,8 @@ public class PotTracker {
             if (client.world != null) {
                 PlayerEntity player = client.world.getPlayerByUuid(uuid);
                 if (player != null) {
-                    String name = player.getGameProfile() != null && player.getGameProfile().getName() != null
-                            ? player.getGameProfile().getName()
+                    String name = player.getGameProfile() != null && player.getGameProfile().name() != null
+                            ? player.getGameProfile().name()
                             : player.getName().getString();
                     if (name != null && !name.trim().isEmpty()) {
                         playerNames.put(uuid, name.trim());
@@ -85,8 +85,8 @@ public class PotTracker {
             }
             if (client.getNetworkHandler() != null) {
                 PlayerListEntry entry = client.getNetworkHandler().getPlayerListEntry(uuid);
-                if (entry != null && entry.getProfile() != null && entry.getProfile().getName() != null) {
-                    String name = entry.getProfile().getName();
+                if (entry != null && entry.getProfile() != null && entry.getProfile().name() != null) {
+                    String name = entry.getProfile().name();
                     if (name != null && !name.trim().isEmpty()) {
                         playerNames.put(uuid, name.trim());
                         return name.trim();

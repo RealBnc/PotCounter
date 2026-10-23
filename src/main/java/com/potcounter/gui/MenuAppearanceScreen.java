@@ -4,6 +4,7 @@ import com.potcounter.PotCounterMod;
 import com.potcounter.config.CounterConfig;
 import com.potcounter.render.ColorHelper;
 import com.potcounter.render.TextHelper;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -176,8 +177,10 @@ public class MenuAppearanceScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (click.button() == 0) {
+            double mouseX = click.x();
+            double mouseY = click.y();
             int mx = config.getMenuX();
             int my = config.getMenuY();
             float scale = config.getMenuScale();
@@ -198,21 +201,23 @@ public class MenuAppearanceScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseReleased(Click click) {
+        if (click.button() == 0) {
             isDragging = false;
             isResizing = false;
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(click);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
         float scale = config.getMenuScale();
+        double mouseX = click.x();
+        double mouseY = click.y();
 
         if (isDragging) {
             int newX = (int) (mouseX - dragOffsetX);
@@ -234,7 +239,7 @@ public class MenuAppearanceScreen extends Screen {
             return true;
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click, deltaX, deltaY);
     }
 
     @Override

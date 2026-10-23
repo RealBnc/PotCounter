@@ -124,7 +124,7 @@ public class PotDetectionManager {
             return;
         }
 
-        Vec3d vel = new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ());
+        Vec3d vel = packet.getVelocity();
         if (vel == null || (vel.x == 0.0 && vel.y == 0.0 && vel.z == 0.0)) {
             return;
         }
