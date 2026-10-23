@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "potcounter",
+  "version": "${version}",
+  "name": "Pot Counter",
+  "description": "Client-side Fabric mod that tracks Healing splash potions in combat and renders live counters overhead, next to nametags, or in an interactive HUD.",
+  "authors": [
+    "RealBnc"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net"
+  },
+  "license": "MIT",
+  "icon": "assets/potcounter/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.potcounter.PotCounterMod"
+    ]
+  },
+  "mixins": [
+    "potcounter.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": "*",
+    "m4lib": "*"
+  }
+}
+

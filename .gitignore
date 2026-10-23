@@ -1,0 +1,14 @@
+build/
+.gradle/
+.fabric/
+bin/
+out/
+.idea/
+*.ipr
+*.iws
+*.iml
+.vscode/
+run/
+crash-reports/
+logs/
+*.log
