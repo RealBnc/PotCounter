@@ -4,9 +4,7 @@
   "version": "${version}",
   "name": "Pot Counter",
   "description": "Client-side Fabric mod that tracks Healing splash potions in combat and renders live counters overhead, next to nametags, or in an interactive HUD.",
-  "authors": [
-    "RealBnc"
-  ],
+  "authors": [`n    "RealBnc",`n    "m4ssivee"`n  ],
   "contact": {
     "homepage": "https://fabricmc.net"
   },
@@ -29,3 +27,4 @@
     "m4lib": "*"
   }
 }
+
