@@ -9,7 +9,7 @@
     "ClientPlayerInteractionManagerMixin",
     "LivingEntityMixin",
     "InGameHudMixin",
-    "TextDisplayEntityMixin",
+    "TextDisplayEntityRendererMixin",
     "PlayerEntityRendererMixin",
     "ArmorStandEntityRendererMixin"
   ]

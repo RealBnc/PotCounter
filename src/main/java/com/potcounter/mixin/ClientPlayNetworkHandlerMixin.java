@@ -17,8 +17,11 @@ import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRespawnS2CPacket;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,13 +38,22 @@ public abstract class ClientPlayNetworkHandlerMixin {
     private void onEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci) {
         if (!PotCounterMod.isModActive()) return;
         EntityType<?> type = packet.getEntityType();
-        if (this.world != null && type == EntityType.POTION) {
+        if (this.world != null && isPotionEntityType(type)) {
             DiagnosticsTracker.potionSpawnCalls.incrementAndGet();
             PotCounterMod mod = PotCounterMod.getInstance();
             if (mod != null) {
                 mod.getPotDetectionManager().onPotionSpawnPacket(packet, this.world);
             }
         }
+    }
+
+    @Unique
+    private static boolean isPotionEntityType(EntityType<?> type) {
+        if (type == null) return false;
+        Identifier id = Registries.ENTITY_TYPE.getId(type);
+        if (id == null) return false;
+        String path = id.getPath();
+        return "splash_potion".equals(path) || "potion".equals(path);
     }
 
     @Inject(method = "onEntityTrackerUpdate", at = @At("RETURN"), require = 1)

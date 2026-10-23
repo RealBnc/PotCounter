@@ -49,7 +49,7 @@ public class PotCounterMod implements ClientModInitializer {
         this.potTracker = new PotTracker(combatManager, configManager.getConfig());
         this.potDetectionManager = new PotDetectionManager(potTracker, combatManager, soundManager);
 
-        // Direct 1.21.11 KeyBinding registration without reflection
+        // Native 1.21.3 KeyBinding registration
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.potcounter.open_menu",
                 InputUtil.Type.KEYSYM,

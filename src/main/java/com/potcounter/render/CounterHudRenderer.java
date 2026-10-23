@@ -12,28 +12,27 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CounterHudRenderer {
-    private static int scrollOffset = 0;
 
     public static void render(DrawContext context, PotTracker tracker, CounterConfig config) {
-        if (config.getCounterDisplay() != CounterDisplay.MENU) {
+        if (config == null || tracker == null || config.getCounterDisplay() != CounterDisplay.MENU) {
             return;
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null || client.world == null) {
+        if (client == null || client.player == null || client.world == null) {
             return;
         }
 
         UUID localUuid = client.player.getUuid();
         Map<UUID, Integer> entries = tracker.getActiveEntries(localUuid);
-        if (entries.isEmpty()) {
+        if (entries == null || entries.isEmpty()) {
             return;
         }
 
         int screenWidth = client.getWindow().getScaledWidth();
-        float scale = config.getMenuScale();
-        int baseWidth = config.getMenuWidth();
-        int baseHeight = config.getMenuHeight();
+        float scale = config.getMenuScale() <= 0.1f ? 1.0f : config.getMenuScale();
+        int baseWidth = Math.max(90, config.getMenuWidth());
+        int baseHeight = Math.max(30, config.getMenuHeight());
 
         int x = config.getMenuX();
         int y = config.getMenuY();
@@ -42,10 +41,13 @@ public class CounterHudRenderer {
             // Auto top-right
             x = screenWidth - (int)(baseWidth * scale) - 10;
         }
+        if (y < 0) {
+            y = 10;
+        }
 
         TextRenderer tr = client.textRenderer;
-        int padding = config.getMenuPadding();
-        int lineSpacing = config.getMenuLineSpacing();
+        int padding = Math.max(2, config.getMenuPadding());
+        int lineSpacing = Math.max(1, config.getMenuLineSpacing());
 
         context.getMatrices().push();
         context.getMatrices().translate((double) x, (double) y, 0.0);
@@ -85,54 +87,35 @@ public class CounterHudRenderer {
         }
 
         int rowHeight = tr.fontHeight + lineSpacing;
-        int availableHeight = h - contentY - padding;
 
-        boolean scissorActive = false;
-        try {
-            int screenX = (int)(x);
-            int screenY = (int)(y + contentY * scale);
-            int screenW = (int)(w * scale);
-            int screenH = (int)(availableHeight * scale);
-            context.enableScissor(screenX, screenY, screenX + screenW, screenY + screenH);
-            scissorActive = true;
-        } catch (Throwable ignored) {}
-
-        int currentY = contentY - scrollOffset;
-
+        // 4. Render Active Players & Pot Counts
         for (Map.Entry<UUID, Integer> entry : entries.entrySet()) {
+            if (contentY + tr.fontHeight > h - padding) {
+                break;
+            }
+
             UUID uuid = entry.getKey();
             int count = entry.getValue();
 
             String name = tracker.getPlayerName(uuid);
+            if (name == null || name.trim().isEmpty()) {
+                name = "Opponent";
+            }
             String countStr = "-" + count;
 
             int potColor = ColorHelper.getPotColor(count, config.isMenuAutoColor(), config.getMenuCustomColor());
 
-            if (currentY + tr.fontHeight >= contentY && currentY <= h - padding) {
-                // Draw player name on the left in crisp clean white
-                TextHelper.drawTextWithShadow(context, tr, Text.literal(name), padding, currentY, 0xFFEDEDED);
+            // Draw player name on the left in crisp clean white
+            TextHelper.drawTextWithShadow(context, tr, Text.literal(name), padding, contentY, 0xFFEDEDED);
 
-                // Draw pot count on the right
-                int countWidth = tr.getWidth(countStr);
-                int countX = w - padding - countWidth;
-                TextHelper.drawTextWithShadow(context, tr, Text.literal(countStr), countX, currentY, potColor | 0xFF000000);
-            }
+            // Draw pot count on the right
+            int countWidth = tr.getWidth(countStr);
+            int countX = w - padding - countWidth;
+            TextHelper.drawTextWithShadow(context, tr, Text.literal(countStr), countX, contentY, potColor | 0xFF000000);
 
-            currentY += rowHeight;
-        }
-
-        if (scissorActive) {
-            try {
-                context.disableScissor();
-            } catch (Throwable ignored) {}
+            contentY += rowHeight;
         }
 
         context.getMatrices().pop();
-    }
-
-    public static void handleScroll(double amount, int totalEntries, int availableHeight, int rowHeight) {
-        int totalHeight = totalEntries * rowHeight;
-        int maxScroll = Math.max(0, totalHeight - availableHeight);
-        scrollOffset = (int) Math.max(0, Math.min(maxScroll, scrollOffset - (amount * 10)));
     }
 }

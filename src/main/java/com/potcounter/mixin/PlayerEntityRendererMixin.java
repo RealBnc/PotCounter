@@ -9,63 +9,42 @@ import com.potcounter.render.NametagHelper;
 import com.potcounter.tracker.PotTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAttachmentType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerEntityRenderer.class)
 public abstract class PlayerEntityRendererMixin {
 
     @Inject(
-        method = "renderLabelIfPresent(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
-        at = @At("HEAD"),
-        cancellable = true
+        method = "updateRenderState(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V",
+        at = @At("TAIL")
     )
-    private void onRenderLabelIfPresent(AbstractClientPlayerEntity player, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta, CallbackInfo ci) {
+    private void onUpdateRenderState(AbstractClientPlayerEntity entity, PlayerEntityRenderState state, float tickProgress, CallbackInfo ci) {
         if (!PotCounterMod.isModActive()) return;
         PotCounterMod mod = PotCounterMod.getInstance();
         if (mod == null) return;
-        if (mod.getConfig().getCounterDisplay() != CounterDisplay.NAMETAG) return;
-
-        Entity serverNametag = NametagHelper.findServerNametagEntity(player);
-        if (serverNametag != null) {
-            // Suppress vanilla overlapping belowName score (14❤) when server uses custom TextDisplay
-            ci.cancel();
-        }
-    }
-
-    @ModifyVariable(
-        method = "renderLabelIfPresent(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/text/Text;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IF)V",
-        at = @At("HEAD"),
-        argsOnly = true,
-        ordinal = 0
-    )
-    private Text onModifyNametagText(
-            Text text,
-            AbstractClientPlayerEntity player,
-            Text textArg,
-            MatrixStack matrices,
-            VertexConsumerProvider vertexConsumers,
-            int light,
-            float tickDelta
-    ) {
-        if (!PotCounterMod.isModActive()) return text;
-        PotCounterMod mod = PotCounterMod.getInstance();
-        if (mod == null) return text;
 
         CounterConfig config = mod.getConfig();
-        if (config.getCounterDisplay() != CounterDisplay.NAMETAG) return text;
+        if (config.getCounterDisplay() != CounterDisplay.NAMETAG) {
+            return;
+        }
+
+        PlayerEntity player = entity;
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null || client.player == null || player.getUuid().equals(client.player.getUuid())) {
-            return text;
+            return;
         }
 
         PotTracker tracker = mod.getPotTracker();
@@ -77,14 +56,55 @@ public abstract class PlayerEntityRendererMixin {
             isEligible = (data != null && data.shouldDisplay()) || mod.getCombatManager().isOpponent(player.getUuid());
         }
 
-        if (!isEligible) return text;
-
-        PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
-        if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
-            return text; // Do not append -0, start directly at -1
+        if (!isEligible) {
+            return;
         }
 
-        if (MarkerHelper.hasMarker(text)) return text;
-        return MarkerHelper.mark(text.copy().append(data.getSuffixText()));
+        // Check if the server already has a TextDisplay / ArmorStand containing the player's name
+        Entity serverNametagEntity = NametagHelper.findServerNametagEntity(player);
+        if (serverNametagEntity != null) {
+            // The server's TextDisplay is already rendering the custom nametag at the server's exact position.
+            // Suppress vanilla's overlapping belowName score so it doesn't clash directly on the player's name.
+            state.playerName = null;
+            state.displayName = null;
+            return;
+        }
+
+        // Server does NOT have a TextDisplay nametag -> Render our custom nametag above the head
+        if (state.squaredDistanceToCamera > 65536.0) {
+            return;
+        }
+
+        Text serverNametag = resolveServerDisplayName(player);
+        PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
+        MutableText suffix = (data != null && data.getCount() > 0) ? data.getSuffixText() : null;
+
+        MutableText customNametag;
+        if (MarkerHelper.hasMarker(serverNametag)) {
+            customNametag = serverNametag.copy();
+        } else if (suffix != null) {
+            customNametag = serverNametag.copy().append(suffix);
+        } else {
+            customNametag = serverNametag.copy();
+        }
+
+        state.displayName = customNametag;
+
+        if (state.nameLabelPos == null) {
+            Vec3d pos = player.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, player.getLerpedYaw(tickProgress));
+            if (pos == null) {
+                pos = new Vec3d(0.0, player.getEyeHeight(player.getPose()) + 0.5, 0.0);
+            }
+            state.nameLabelPos = pos;
+        }
+    }
+
+    @Unique
+    private static Text resolveServerDisplayName(PlayerEntity player) {
+        Text displayName = player.getDisplayName();
+        if (displayName != null && !displayName.getString().trim().isEmpty() && !MarkerHelper.hasMarker(displayName)) {
+            return displayName;
+        }
+        return player.getName();
     }
 }

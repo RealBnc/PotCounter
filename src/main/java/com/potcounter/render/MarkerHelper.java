@@ -5,10 +5,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
-/**
- * Robust marker for PotCounter text components.
- * Prevents duplicate suffix appending without relying on fragile regex matching.
- */
 public class MarkerHelper {
     public static final ClickEvent POT_MARKER = new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "potcounter_marker");
 
