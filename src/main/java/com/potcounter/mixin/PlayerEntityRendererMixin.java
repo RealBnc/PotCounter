@@ -40,7 +40,9 @@ public abstract class PlayerEntityRendererMixin {
             return;
         }
 
-        PlayerEntity player = entity;
+        if (!(entity instanceof PlayerEntity player)) {
+            return;
+        }
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null || client.player == null || player.getUuid().equals(client.player.getUuid())) {

@@ -263,9 +263,9 @@ public class MenuAppearanceScreen extends Screen {
         int h = config.getMenuHeight();
         int padding = config.getMenuPadding();
 
-        context.getMatrices().push();
-        context.getMatrices().translate((double) x, (double) y, 0.0);
-        context.getMatrices().scale(scale, scale, 1.0f);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate((float) x, (float) y);
+        context.getMatrices().scale(scale, scale);
 
         // Background
         if (config.isMenuBackgroundEnabled()) {
@@ -317,7 +317,7 @@ public class MenuAppearanceScreen extends Screen {
         // Resize corner indicator (Golden grip)
         context.fill(w - 7, h - 7, w - 1, h - 1, 0xFFFFD54F);
 
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
     }
 
     @Override

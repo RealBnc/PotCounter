@@ -4,6 +4,7 @@ import com.potcounter.PotCounterMod;
 import com.potcounter.config.CounterConfig;
 import com.potcounter.config.CounterDisplay;
 import com.potcounter.config.CounterMode;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
@@ -198,7 +199,7 @@ public class MainConfigScreen extends Screen {
         int logoX = centerX - logoWidth / 2;
         int logoY = topY;
 
-        context.drawTexture(RenderLayer::getGuiTextured, LOGO_TEXTURE, logoX, logoY, 0.0f, 0.0f, logoWidth, logoHeight, logoWidth, logoHeight);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, LOGO_TEXTURE, logoX, logoY, 0.0f, 0.0f, logoWidth, logoHeight, logoWidth, logoHeight);
     }
 
     @Override

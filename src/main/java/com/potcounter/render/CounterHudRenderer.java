@@ -48,9 +48,9 @@ public class CounterHudRenderer {
         int padding = Math.max(2, config.getMenuPadding());
         int lineSpacing = Math.max(1, config.getMenuLineSpacing());
 
-        context.getMatrices().push();
-        context.getMatrices().translate((double) x, (double) y, 0.0);
-        context.getMatrices().scale(scale, scale, 1.0f);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate((float) x, (float) y);
+        context.getMatrices().scale(scale, scale);
 
         // Render card relative to 0,0 inside scaled matrix
         int w = baseWidth;
@@ -73,8 +73,7 @@ public class CounterHudRenderer {
             context.fill(w - 1, 0, w, h, border);
         }
 
-        // Advance Z slightly so text renders strictly in front of background
-        context.getMatrices().translate(0.0, 0.0, 1.0);
+        // In 1.21.11, Matrix3x2fStack is 2D
 
         int contentY = padding + 2;
 
@@ -118,6 +117,6 @@ public class CounterHudRenderer {
             contentY += rowHeight;
         }
 
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
     }
 }
