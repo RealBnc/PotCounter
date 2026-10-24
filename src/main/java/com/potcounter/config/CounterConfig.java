@@ -6,16 +6,13 @@ public class CounterConfig {
     private CounterDisplay counterDisplay = CounterDisplay.NAMETAG;
     private boolean debugMode = false;
 
-    // Sound
     private boolean soundEnabled = true;
     private String soundId = "minecraft:entity.experience_orb.pickup";
     private float soundVolume = 1.0f;
 
-    // General Colors
     private boolean autoColor = true;
-    private int customColor = 0xFFD54F; // Golden Yellow
+    private int customColor = 0xFFD54F;
 
-    // Name appearance
     private float nameFontScale = 1.0f;
     private int nameOffsetX = 0;
     private int nameOffsetY = 0;
@@ -27,7 +24,6 @@ public class CounterConfig {
     private int nameBorderColor = 0xFFD54F;
     private int namePadding = 1;
 
-    // 1st HUD Menu appearance (Black & Gold theme by default)
     private int menuX = -1;
     private int menuY = 10;
     private int menuWidth = 140;
@@ -47,7 +43,6 @@ public class CounterConfig {
 
     public CounterConfig() {}
 
-    // Getters and Setters
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
@@ -75,7 +70,6 @@ public class CounterConfig {
     public int getCustomColor() { return customColor; }
     public void setCustomColor(int customColor) { this.customColor = customColor; }
 
-    // Name appearance
     public float getNameFontScale() { return Math.max(0.5f, Math.min(2.0f, nameFontScale)); }
     public void setNameFontScale(float nameFontScale) { this.nameFontScale = Math.max(0.5f, Math.min(2.0f, nameFontScale)); }
 
@@ -106,7 +100,6 @@ public class CounterConfig {
     public int getNamePadding() { return Math.max(0, Math.min(10, namePadding)); }
     public void setNamePadding(int namePadding) { this.namePadding = Math.max(0, Math.min(10, namePadding)); }
 
-    // 1st HUD Menu appearance
     public int getMenuX() { return menuX; }
     public void setMenuX(int menuX) { this.menuX = menuX; }
 

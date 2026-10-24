@@ -49,7 +49,6 @@ public class PotCounterMod implements ClientModInitializer {
         this.potTracker = new PotTracker(combatManager, configManager.getConfig());
         this.potDetectionManager = new PotDetectionManager(potTracker, combatManager, soundManager);
 
-        // Native 1.21.3 KeyBinding registration
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.potcounter.open_menu",
                 InputUtil.Type.KEYSYM,
@@ -57,7 +56,6 @@ public class PotCounterMod implements ClientModInitializer {
                 "key.category.potcounter"
         ));
 
-        // Client tick: process key events, combat cleanup, detection queue, and tick rendering cache
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (configKeyBinding != null) {
                 while (configKeyBinding.wasPressed()) {
@@ -85,7 +83,6 @@ public class PotCounterMod implements ClientModInitializer {
             }
         });
 
-        // Connection events: reset transient state on disconnect
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             LOGGER.info("Disconnected from server, resetting combat and pot tracking state.");
             combatManager.clear();
@@ -93,7 +90,6 @@ public class PotCounterMod implements ClientModInitializer {
             potDetectionManager.clear();
         });
 
-        // Register client commands: /potcounter and /potcounter debug
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("potcounter")
                     .executes(context -> {

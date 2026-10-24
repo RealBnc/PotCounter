@@ -13,7 +13,6 @@ public class MenuAppearanceScreen extends Screen {
     private final Screen parent;
     private final CounterConfig config;
 
-    // Snapshot for Cancel functionality
     private final int origX, origY, origW, origH;
     private final float origScale;
     private final boolean origBg, origBorder, origAuto, origShowTitle;
@@ -55,7 +54,6 @@ public class MenuAppearanceScreen extends Screen {
         int btnWidth = 115;
         int btnHeight = 20;
 
-        // Row 1: Theme Preset, Scale, Width, Height
         ButtonWidget themeBtn = ButtonWidget.builder(
                 getThemeButtonText(),
                 button -> {
@@ -87,7 +85,6 @@ public class MenuAppearanceScreen extends Screen {
         );
         addDrawableChild(heightSlider);
 
-        // Row 2: Background, Border, Title Toggle, Opacity
         int row2Y = panelY + 24;
 
         ButtonWidget bgToggle = ButtonWidget.builder(
@@ -124,7 +121,6 @@ public class MenuAppearanceScreen extends Screen {
         );
         addDrawableChild(opacitySlider);
 
-        // Row 3: Reset, Cancel, Save
         int row3Y = row2Y + 24;
 
         ButtonWidget resetBtn = ButtonWidget.builder(
@@ -184,13 +180,11 @@ public class MenuAppearanceScreen extends Screen {
             int mw = (int)(config.getMenuWidth() * scale);
             int mh = (int)(config.getMenuHeight() * scale);
 
-            // Check resize handle (14x14 corner at bottom right)
             if (mouseX >= mx + mw - 14 && mouseX <= mx + mw + 4 && mouseY >= my + mh - 14 && mouseY <= my + mh + 4) {
                 isResizing = true;
                 return true;
             }
 
-            // Check drag body
             if (mouseX >= mx && mouseX <= mx + mw && mouseY >= my && mouseY <= my + mh) {
                 isDragging = true;
                 dragOffsetX = (int) (mouseX - mx);
@@ -239,19 +233,17 @@ public class MenuAppearanceScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        // Dark translucent overlay
+
         context.fill(0, 0, this.width, this.height, 0x88000000);
 
-        // Control Panel container at bottom (Sleek Black & Gold)
         int panelY = this.height - 116;
         context.fill(10, panelY - 4, 510, this.height - 6, 0xEE111116);
-        context.fill(10, panelY - 4, 510, panelY - 2, 0xFFFFD54F); // Gold accent line
+        context.fill(10, panelY - 4, 510, panelY - 2, 0xFFFFD54F);
 
         TextHelper.drawText(context, this.textRenderer, Text.literal("§6⚡ HUD Customization Panel §7(Drag window to move, bottom-right corner to resize)"), 18, panelY - 14, 0xFFFFD54F);
 
         super.render(context, mouseX, mouseY, delta);
 
-        // Render Live Preview
         renderPreviewMenu(context);
     }
 
@@ -267,16 +259,14 @@ public class MenuAppearanceScreen extends Screen {
         context.getMatrices().translate((double) x, (double) y, 0.0);
         context.getMatrices().scale(scale, scale, 1.0f);
 
-        // Background
         if (config.isMenuBackgroundEnabled()) {
             int bg = ColorHelper.applyAlpha(config.getMenuBackgroundColor(), config.getMenuBackgroundOpacity());
             context.fill(0, 0, w, h, bg);
         }
 
-        // Border
         if (config.isMenuBorderEnabled()) {
             int border = config.getMenuBorderColor();
-            context.fill(0, 0, w, 2, border); // Gold top accent bar
+            context.fill(0, 0, w, 2, border);
             context.fill(0, h - 1, w, h, border);
             context.fill(0, 0, 1, h, border);
             context.fill(w - 1, 0, w, h, border);
@@ -284,7 +274,6 @@ public class MenuAppearanceScreen extends Screen {
 
         int curY = padding + 2;
 
-        // Title
         if (config.isMenuShowTitle()) {
             String title = "⚡ POTS (" + config.getCounterMode().getDisplayName() + ")";
             TextHelper.drawText(context, this.textRenderer, Text.literal(title), padding, curY, config.getMenuBorderColor());
@@ -293,7 +282,6 @@ public class MenuAppearanceScreen extends Screen {
             curY += 2;
         }
 
-        // Sample Players (Names clearly shown, NOT numbers!)
         String[] sampleNames = { "RealBnc", "xKralTR", "Opponent" };
         int[] samplePots = { 14, 8, 2 };
 
@@ -304,17 +292,14 @@ public class MenuAppearanceScreen extends Screen {
             String countStr = "-" + samplePots[i];
             int potColor = ColorHelper.getPotColor(samplePots[i], config.isMenuAutoColor(), config.getMenuCustomColor());
 
-            // Name on left (Clean white)
             TextHelper.drawTextWithShadow(context, this.textRenderer, Text.literal(name), padding, curY, 0xFFEDEDED);
 
-            // Count on right
             int countW = this.textRenderer.getWidth(countStr);
             TextHelper.drawTextWithShadow(context, this.textRenderer, Text.literal(countStr), w - padding - countW, curY, potColor | 0xFF000000);
 
             curY += this.textRenderer.fontHeight + config.getMenuLineSpacing();
         }
 
-        // Resize corner indicator (Golden grip)
         context.fill(w - 7, h - 7, w - 1, h - 1, 0xFFFFD54F);
 
         context.getMatrices().pop();

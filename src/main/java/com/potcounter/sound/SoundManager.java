@@ -40,7 +40,6 @@ public class SoundManager {
                 identifier = Identifier.of("minecraft", "entity.experience_orb.pickup");
             }
 
-            // Direct sound event creation - completely avoids registry get method differences across MC versions
             SoundEvent soundEvent = SoundEvent.of(identifier);
             if (soundEvent != null) {
                 client.getSoundManager().play(PositionedSoundInstance.master(soundEvent, 1.0f, volume));
