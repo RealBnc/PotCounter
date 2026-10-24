@@ -70,7 +70,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onEntityAnimation", at = @At("RETURN"), require = 1)
     private void onEntityAnimation(EntityAnimationS2CPacket packet, CallbackInfo ci) {
         if (!PotCounterMod.isModActive()) return;
-        if (packet.getAnimationId() == 0 && this.world != null) { // SWING_MAIN_HAND
+        if (packet.getAnimationId() == 0 && this.world != null) {
             PotCounterMod mod = PotCounterMod.getInstance();
             if (mod != null) {
                 mod.getPotDetectionManager().onPlayerArmSwing(packet.getEntityId());

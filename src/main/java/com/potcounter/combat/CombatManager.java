@@ -20,16 +20,10 @@ public class CombatManager {
     private final Map<CombatPair, CombatSession> sessions = new ConcurrentHashMap<>();
     private UUID currentActiveOpponent = null;
 
-    // Track previous position for arena teleportation detection
     private double lastPosX = Double.NaN;
     private double lastPosY = Double.NaN;
     private double lastPosZ = Double.NaN;
 
-    /**
-     * Records a hit between two players.
-     * Karşıdaki oyuncu bize vurmadan sayaç belirmesin kuralı:
-     * Combat is confirmed once mutual hits have taken place.
-     */
     public void recordHit(UUID attacker, UUID victim, UUID localPlayerUuid) {
         if (attacker == null || victim == null || attacker.equals(victim)) {
             return;
@@ -48,7 +42,6 @@ public class CombatManager {
                 session.setOpponentHitLocal(true);
             }
 
-            // Both have traded hits -> confirmed combat
             if (session.isLocalHitOpponent() && session.isOpponentHitLocal()) {
                 boolean wasConfirmed = session.isConfirmed();
                 session.setConfirmed(true);
@@ -97,9 +90,6 @@ public class CombatManager {
         return result;
     }
 
-    /**
-     * Resolves opponent in duels with 100% accuracy and monitors round/teleport resets.
-     */
     public void checkArenaDuel(MinecraftClient client) {
         if (client == null || client.world == null || client.player == null) {
             return;
@@ -110,13 +100,12 @@ public class CombatManager {
         double py = client.player.getY();
         double pz = client.player.getZ();
 
-        // 1. Teleportation check: if player teleported across world (> 25 blocks in 1 tick)
         if (!Double.isNaN(lastPosX)) {
             double dx = px - lastPosX;
             double dy = py - lastPosY;
             double dz = pz - lastPosZ;
             double distSq = dx * dx + dy * dy + dz * dz;
-            if (distSq > 625.0) { // > 25 blocks in 1 tick
+            if (distSq > 625.0) {
                 LOGGER.info("Arena teleport detected! Resetting combat and pot tracker state.");
                 clear();
                 PotCounterMod mod = PotCounterMod.getInstance();
@@ -129,14 +118,13 @@ public class CombatManager {
         lastPosY = py;
         lastPosZ = pz;
 
-        // 2. Verify active opponent status (alive and not 0 health)
         if (currentActiveOpponent != null) {
             PlayerEntity opp = client.world.getPlayerByUuid(currentActiveOpponent);
             if (opp == null || opp.isDead() || opp.getHealth() <= 0.0f) {
                 LOGGER.info("Active opponent {} died or left, resetting round.", currentActiveOpponent);
                 handlePlayerDeath(currentActiveOpponent);
             } else {
-                // Keep combat session continuously active throughout the arena duel
+
                 CombatSession session = getOrCreateSession(currentActiveOpponent, localUuid);
                 session.setConfirmed(true);
                 session.setLocalHitOpponent(true);
@@ -146,7 +134,6 @@ public class CombatManager {
             return;
         }
 
-        // 3. Scoreboard Scan (McPvp Duel Sidebar)
         Scoreboard scoreboard = client.world.getScoreboard();
         if (scoreboard != null) {
             ScoreboardObjective sidebar = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
@@ -172,7 +159,6 @@ public class CombatManager {
             }
         }
 
-        // 4. World Scan: 1 other non-spectator player in the world instance
         List<PlayerEntity> otherSurvivalPlayers = new ArrayList<>();
         for (PlayerEntity p : client.world.getPlayers()) {
             if (p.getUuid().equals(localUuid)) continue;
@@ -194,12 +180,11 @@ public class CombatManager {
             PotCounterMod mod = PotCounterMod.getInstance();
             if (mod != null) {
                 mod.getPotTracker().updatePlayerName(oppUuid, name);
-                // Clean start for new opponent
+
                 mod.getPotTracker().resetCombatPotCount(oppUuid);
             }
         }
 
-        // Immediately activate combat session so nametag and tracker activate immediately
         MinecraftClient client = MinecraftClient.getInstance();
         if (client != null && client.player != null) {
             CombatSession session = getOrCreateSession(oppUuid, client.player.getUuid());
@@ -249,7 +234,6 @@ public class CombatManager {
             currentActiveOpponent = null;
         }
 
-        // Clean round reset
         PotCounterMod mod = PotCounterMod.getInstance();
         if (mod != null) {
             mod.getPotTracker().onRoundEnd();

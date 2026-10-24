@@ -62,17 +62,14 @@ public abstract class PlayerEntityRendererMixin {
             return;
         }
 
-        // Check if the server already has a TextDisplay / ArmorStand containing the player's name
         Entity serverNametagEntity = NametagHelper.findServerNametagEntity(player);
         if (serverNametagEntity != null) {
-            // The server's TextDisplay is already rendering the custom nametag at the server's exact position.
-            // Suppress vanilla's overlapping belowName score so it doesn't clash directly on the player's name.
+
             state.playerName = null;
             state.displayName = null;
             return;
         }
 
-        // Server does NOT have a TextDisplay nametag -> Render our custom nametag above the head
         if (state.squaredDistanceToCamera > 65536.0) {
             return;
         }

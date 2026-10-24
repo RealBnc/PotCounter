@@ -52,7 +52,6 @@ public abstract class ArmorStandEntityRendererMixin {
 
         if (!isEligible) return;
 
-        // Only target the line that directly contains the player's name
         if (!NametagHelper.containsPlayerName(armorStand, player.getName().getString())) {
             return;
         }
@@ -63,7 +62,7 @@ public abstract class ArmorStandEntityRendererMixin {
         }
 
         PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
-        // Do not display counter suffix if player has not thrown any pots yet (starts directly from -1)
+
         if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
             return;
         }
