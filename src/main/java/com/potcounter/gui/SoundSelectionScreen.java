@@ -42,7 +42,6 @@ public class SoundSelectionScreen extends Screen {
         int buttonWidth = 180;
         int buttonHeight = 20;
 
-        // Render 10 sound options across two columns of 5
         for (int i = 0; i < SoundOption.AVAILABLE_SOUNDS.length; i++) {
             final int index = i;
             SoundOption option = SoundOption.AVAILABLE_SOUNDS[i];
@@ -62,7 +61,6 @@ public class SoundSelectionScreen extends Screen {
             addDrawableChild(soundButton);
         }
 
-        // Volume Slider
         int bottomY = startY + (5 * 24) + 10;
         CustomSliderWidget volumeSlider = new CustomSliderWidget(
                 centerX - 100,
@@ -82,7 +80,6 @@ public class SoundSelectionScreen extends Screen {
         );
         addDrawableChild(volumeSlider);
 
-        // Preview Button
         ButtonWidget previewButton = ButtonWidget.builder(
                 Text.literal("▶ Test Selected Sound"),
                 button -> {
@@ -92,7 +89,6 @@ public class SoundSelectionScreen extends Screen {
         ).dimensions(centerX - 100, bottomY + 24, 200, 20).build();
         addDrawableChild(previewButton);
 
-        // Back Button
         ButtonWidget backButton = ButtonWidget.builder(
                 Text.literal("Back"),
                 button -> close()

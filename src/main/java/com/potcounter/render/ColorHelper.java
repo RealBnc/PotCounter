@@ -3,10 +3,10 @@ package com.potcounter.render;
 public final class ColorHelper {
     private ColorHelper() {}
 
-    private static final int COLOR_0 = 0x00FF00;   // Pure Green
-    private static final int COLOR_5 = 0xFFFF55;   // Light Yellow
-    private static final int COLOR_10 = 0xFF5555;  // Light Red
-    private static final int COLOR_16 = 0xFF0000;  // Full Red
+    private static final int COLOR_0 = 0x00FF00;
+    private static final int COLOR_5 = 0xFFFF55;
+    private static final int COLOR_10 = 0xFF5555;
+    private static final int COLOR_16 = 0xFF0000;
 
     public static int getPotColor(int count, boolean autoColor, int customColor) {
         if (!autoColor) {
