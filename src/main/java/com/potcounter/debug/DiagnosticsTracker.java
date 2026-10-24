@@ -93,7 +93,6 @@ public class DiagnosticsTracker {
             boolean inCombat = mod.getCombatManager().isInCombatWith(uuid, localPlayer.getUuid());
             Boolean hasLabel = getLastHasLabel(uuid);
 
-            // Check passengers & vehicle
             List<Entity> passengers = p.getPassengerList();
             StringBuilder passStr = new StringBuilder();
             for (Entity pass : passengers) {
@@ -107,7 +106,6 @@ public class DiagnosticsTracker {
                 }
             }
 
-            // Check nearby floating nametag entities (e.g. TAB armor stand / text display holograms)
             Box searchBox = p.getBoundingBox().expand(2.5, 3.0, 2.5);
             List<Entity> nearbyEntities = client.world.getOtherEntities(p, searchBox, e ->
                     e instanceof DisplayEntity.TextDisplayEntity || e instanceof ArmorStandEntity);

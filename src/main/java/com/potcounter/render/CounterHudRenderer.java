@@ -37,7 +37,7 @@ public class CounterHudRenderer {
         int y = config.getMenuY();
 
         if (x < 0) {
-            // Auto top-right
+
             x = screenWidth - (int)(baseWidth * scale) - 10;
         }
         if (y < 0) {
@@ -52,45 +52,39 @@ public class CounterHudRenderer {
         context.getMatrices().translate((double) x, (double) y, 0.0);
         context.getMatrices().scale(scale, scale, 1.0f);
 
-        // Render card relative to 0,0 inside scaled matrix
         int w = baseWidth;
         int h = baseHeight;
 
-        // 1. Sleek Modern Background
         if (config.isMenuBackgroundEnabled()) {
             int bg = ColorHelper.applyAlpha(config.getMenuBackgroundColor(), config.getMenuBackgroundOpacity());
             context.fill(0, 0, w, h, bg);
         }
 
-        // 2. Modern Accent Border
         if (config.isMenuBorderEnabled()) {
             int border = config.getMenuBorderColor();
-            // Elegant top accent bar (2px height for high visual impact)
+
             context.fill(0, 0, w, 2, border);
-            // Subtle 1px outline for the rest
+
             context.fill(0, h - 1, w, h, border);
             context.fill(0, 0, 1, h, border);
             context.fill(w - 1, 0, w, h, border);
         }
 
-        // Advance Z slightly so text renders strictly in front of background
         context.getMatrices().translate(0.0, 0.0, 1.0);
 
         int contentY = padding + 2;
 
-        // 3. Header / Title
         if (config.isMenuShowTitle()) {
             String title = "⚡ POTS (" + config.getCounterMode().getDisplayName() + ")";
             context.drawTextWithShadow(tr, title, padding, contentY, config.getMenuBorderColor());
             contentY += tr.fontHeight + 3;
-            // Header divider line
+
             context.fill(padding, contentY - 1, w - padding, contentY, 0x44FFD54F);
             contentY += 2;
         }
 
         int rowHeight = tr.fontHeight + lineSpacing;
 
-        // 4. Render Active Players & Pot Counts
         for (Map.Entry<UUID, Integer> entry : entries.entrySet()) {
             if (contentY + tr.fontHeight > h - padding) {
                 break;
@@ -107,10 +101,8 @@ public class CounterHudRenderer {
 
             int potColor = ColorHelper.getPotColor(count, config.isMenuAutoColor(), config.getMenuCustomColor());
 
-            // Draw player name on the left in crisp clean white
             context.drawTextWithShadow(tr, name, padding, contentY, 0xFFEDEDED);
 
-            // Draw pot count on the right
             int countWidth = tr.getWidth(countStr);
             int countX = w - padding - countWidth;
             context.drawTextWithShadow(tr, countStr, countX, contentY, potColor | 0xFF000000);

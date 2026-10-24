@@ -41,7 +41,6 @@ public class PotTracker {
     private final CombatManager combatManager;
     private final CounterConfig config;
 
-    // Single source of truth for all opponent/player pot counts
     private final Map<UUID, Integer> playerPotCounts = new ConcurrentHashMap<>();
     private final Map<UUID, String> playerNames = new ConcurrentHashMap<>();
     private final Map<UUID, Text> serverCustomNames = new ConcurrentHashMap<>();
@@ -140,7 +139,6 @@ public class PotTracker {
             return;
         }
 
-        // Single source of truth: merge directly into playerPotCounts
         playerPotCounts.merge(throwerUuid, 1, Integer::sum);
         renderCache.remove(throwerUuid);
     }
@@ -159,9 +157,6 @@ public class PotTracker {
         }
     }
 
-    /**
-     * Resets pot counts when a round finishes (player reaches 0 HP).
-     */
     public void onRoundEnd() {
         UUID opp = combatManager.getCurrentActiveOpponent();
         if (opp != null) {
@@ -179,7 +174,6 @@ public class PotTracker {
             return playerPotCounts.getOrDefault(targetUuid, 0);
         }
 
-        // SINGLE mode: only show for active opponent
         if (Objects.equals(combatManager.getCurrentActiveOpponent(), targetUuid)) {
             return playerPotCounts.getOrDefault(targetUuid, 0);
         }
@@ -203,10 +197,9 @@ public class PotTracker {
             return result;
         }
 
-        // SINGLE mode:
         UUID activeOpponent = combatManager.getCurrentActiveOpponent();
         if (activeOpponent == null) {
-            // Fallback 1: check confirmed sessions
+
             List<com.potcounter.combat.CombatSession> sessions = combatManager.getConfirmedSessionsForPlayer(localPlayerUuid);
             for (com.potcounter.combat.CombatSession session : sessions) {
                 UUID opp = session.getPair().getOther(localPlayerUuid);
@@ -217,7 +210,7 @@ public class PotTracker {
             }
         }
         if (activeOpponent == null) {
-            // Fallback 2: check playerPotCounts
+
             for (UUID u : playerPotCounts.keySet()) {
                 if (localPlayerUuid == null || !u.equals(localPlayerUuid)) {
                     activeOpponent = u;
@@ -226,7 +219,7 @@ public class PotTracker {
             }
         }
         if (activeOpponent == null) {
-            // Fallback 3: check other players in world (if duel arena has 1 other player)
+
             MinecraftClient client = MinecraftClient.getInstance();
             if (client != null && client.world != null) {
                 for (PlayerEntity p : client.world.getPlayers()) {
@@ -267,7 +260,6 @@ public class PotTracker {
             int count = getCountForPlayer(uuid, localPlayerUuid);
             boolean inCombat = (localPlayerUuid != null) && combatManager.isInCombatWith(uuid, localPlayerUuid);
 
-            // Display counter ONLY if mutual combat has occurred and player has thrown at least 1 pot
             boolean shouldDisplay = (count > 0) && inCombat;
 
             int color = ColorHelper.getPotColor(count, config.isAutoColor(), config.getCustomColor());

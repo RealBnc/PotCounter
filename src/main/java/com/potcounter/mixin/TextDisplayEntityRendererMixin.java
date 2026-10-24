@@ -67,7 +67,6 @@ public abstract class TextDisplayEntityRendererMixin {
             return;
         }
 
-        // Only target the line that directly contains the player's name
         if (!NametagHelper.containsPlayerName(entity, targetPlayer.getName().getString())) {
             return;
         }
@@ -78,7 +77,7 @@ public abstract class TextDisplayEntityRendererMixin {
         }
 
         PotTracker.CachedPlayerData data = tracker.getCachedData(targetPlayer.getUuid());
-        // Do not display counter suffix if player has not thrown any pots yet (starts directly from -1)
+
         if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
             return;
         }
