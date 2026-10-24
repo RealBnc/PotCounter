@@ -4,10 +4,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
-/**
- * Direct Minecraft 1.21.11 DrawContext text rendering helper.
- * Zero reflection, zero overhead.
- */
 public class TextHelper {
 
     public static void drawText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {

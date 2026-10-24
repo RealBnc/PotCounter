@@ -44,7 +44,6 @@ public class MainConfigScreen extends Screen {
         int centerBtnWidth = 200;
         int centerBtnX = centerX - centerBtnWidth / 2;
 
-        // Calculate vertical start so the logo and buttons are nicely balanced on screen
         int totalHeight = 208;
         int topY = Math.max(10, (this.height - totalHeight) / 2);
 
@@ -54,7 +53,6 @@ public class MainConfigScreen extends Screen {
         int row4Y = row3Y + 28;
         int row5Y = row4Y + 28;
 
-        // Row 1: Center -> Active Toggle (On / Off)
         activeButton = ButtonWidget.builder(
                 getActiveToggleText(),
                 button -> {
@@ -77,7 +75,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(activeButton);
 
-        // Row 2: Left -> Sound Toggle
         soundToggleButton = ButtonWidget.builder(
                 getSoundToggleText(),
                 button -> {
@@ -91,7 +88,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(soundToggleButton);
 
-        // Row 2: Right -> Display Toggle (Nametag / Menu HUD)
         counterDisplayButton = ButtonWidget.builder(
                 getCounterDisplayText(),
                 button -> {
@@ -105,7 +101,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(counterDisplayButton);
 
-        // Row 3: Left -> Sound Selection Submenu
         soundsButton = ButtonWidget.builder(
                 Text.literal("§e🎵 Sound Selection..."),
                 button -> {
@@ -118,7 +113,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(soundsButton);
 
-        // Row 3: Right -> HUD Customization Submenu
         menuAppearanceButton = ButtonWidget.builder(
                 Text.literal("§6⚡ HUD Customization..."),
                 button -> {
@@ -131,7 +125,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(menuAppearanceButton);
 
-        // Row 4: Center -> Counter Mode Toggle (Single / All Players)
         counterModeButton = ButtonWidget.builder(
                 getCounterModeText(),
                 button -> {
@@ -144,7 +137,6 @@ public class MainConfigScreen extends Screen {
          .build();
         addDrawableChild(counterModeButton);
 
-        // Row 5: Center -> Done / Save Button
         doneButton = ButtonWidget.builder(
                 Text.literal("§a✔ Done"),
                 button -> close()
@@ -189,11 +181,9 @@ public class MainConfigScreen extends Screen {
 
         int centerX = this.width / 2;
 
-        // Dynamic vertical centering matching init()
         int totalHeight = 208;
         int topY = Math.max(10, (this.height - totalHeight) / 2);
 
-        // Draw the 3D Minecraft "Pot Counter" logo centered at the top
         int logoWidth = 136;
         int logoHeight = 72;
         int logoX = centerX - logoWidth / 2;
