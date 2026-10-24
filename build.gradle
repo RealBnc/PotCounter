@@ -14,9 +14,6 @@ repositories {
 	mavenCentral()
 	maven { url 'https://maven.fabricmc.net/' }
 	maven { url 'https://maven.terraformersmc.com/releases/' }
-	maven {
-		url uri(System.getProperty("user.home") + "/AppData/Roaming/.dawn/cache/minecraft/cache/dawn-client/libraries/java")
-	}
 	mavenLocal()
 }
 
