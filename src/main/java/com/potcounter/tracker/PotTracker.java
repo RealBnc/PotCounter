@@ -41,7 +41,6 @@ public class PotTracker {
     private final CombatManager combatManager;
     private final CounterConfig config;
 
-    // Single source of truth for all opponent/player pot counts
     private final Map<UUID, Integer> playerPotCounts = new ConcurrentHashMap<>();
     private final Map<UUID, String> playerNames = new ConcurrentHashMap<>();
     private final Map<UUID, Text> serverCustomNames = new ConcurrentHashMap<>();
@@ -135,7 +134,6 @@ public class PotTracker {
             return;
         }
 
-        // Single source of truth: merge directly into playerPotCounts
         playerPotCounts.merge(throwerUuid, 1, Integer::sum);
         renderCache.remove(throwerUuid);
     }
@@ -154,9 +152,6 @@ public class PotTracker {
         }
     }
 
-    /**
-     * Resets pot counts when a round finishes (player reaches 0 HP).
-     */
     public void onRoundEnd() {
         UUID opp = combatManager.getCurrentActiveOpponent();
         if (opp != null) {
@@ -174,7 +169,6 @@ public class PotTracker {
             return playerPotCounts.getOrDefault(targetUuid, 0);
         }
 
-        // SINGLE mode: only show for active opponent
         if (Objects.equals(combatManager.getCurrentActiveOpponent(), targetUuid)) {
             return playerPotCounts.getOrDefault(targetUuid, 0);
         }
@@ -198,7 +192,6 @@ public class PotTracker {
             return result;
         }
 
-        // SINGLE mode
         UUID activeOpponent = combatManager.getCurrentActiveOpponent();
         if (activeOpponent != null) {
             int count = getCountForPlayer(activeOpponent, localPlayerUuid);
@@ -229,7 +222,6 @@ public class PotTracker {
             int count = getCountForPlayer(uuid, localPlayerUuid);
             boolean inCombat = (localPlayerUuid != null) && combatManager.isInCombatWith(uuid, localPlayerUuid);
 
-            // Display counter ONLY if mutual combat has occurred and player has thrown at least 1 pot
             boolean shouldDisplay = (count > 0) && inCombat;
 
             int color = ColorHelper.getPotColor(count, config.isAutoColor(), config.getCustomColor());

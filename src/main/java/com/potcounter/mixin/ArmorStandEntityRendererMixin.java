@@ -63,7 +63,7 @@ public abstract class ArmorStandEntityRendererMixin {
 
         PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
         if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
-            return; // Do not append -0, start directly at -1
+            return;
         }
 
         MutableText modified = text.copy().append(data.getSuffixText());

@@ -39,10 +39,8 @@ public class PotDetectionManager {
 
     private final Set<Integer> processedPotionEntityIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    // Tracks the exact millisecond local player right-clicked with a splash potion
     private volatile long lastLocalPlayerThrowTime = 0;
 
-    // Tracks arm swing timestamps per entity ID
     private final Map<Integer, Long> playerArmSwingTimes = new ConcurrentHashMap<>();
 
     private static class PendingPotionInfo {
@@ -77,10 +75,6 @@ public class PotDetectionManager {
         this.playerArmSwingTimes.put(entityId, System.currentTimeMillis());
     }
 
-    /**
-     * Strictly verifies whether an ItemStack is Splash Potion of Strong Healing (Instant Health II).
-     * Speed, Poison, Weakness, Slowness, Fire Res, Water, and Healing I are 100% REJECTED.
-     */
     public static boolean isHealing2Potion(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return false;
@@ -95,7 +89,6 @@ public class PotDetectionManager {
             return false;
         }
 
-        // 1. Direct registry check for Strong Healing (Instant Health II)
         if (comp.potion().isPresent()) {
             RegistryEntry<Potion> entry = comp.potion().get();
             if (entry.matches(Potions.STRONG_HEALING)) {
@@ -103,14 +96,12 @@ public class PotDetectionManager {
             }
         }
 
-        // 2. Iterate effects: MUST have Instant Health with amplifier >= 1 (Level II)
         for (StatusEffectInstance effect : comp.getEffects()) {
             if (effect.getEffectType().equals(StatusEffects.INSTANT_HEALTH) && effect.getAmplifier() >= 1) {
                 return true;
             }
         }
 
-        // If it does not contain Instant Health II, strictly return false!
         return false;
     }
 
@@ -170,7 +161,7 @@ public class PotDetectionManager {
 
         if (foundStack != null) {
             pendingPotions.remove(entityId);
-            // ONLY process if verified to be Healing II!
+
             if (isHealing2Potion(foundStack)) {
                 processedPotionEntityIds.add(entityId);
                 resolveAndProcess(pending.x, pending.y, pending.z, pending.velocity, pending.ownerId, world);
@@ -180,9 +171,6 @@ public class PotDetectionManager {
         }
     }
 
-    /**
-     * Instantaneous, sub-tick thrower resolution using hand swing, hand item, look vector, and velocity!
-     */
     private void resolveAndProcess(double px, double py, double pz, Vec3d velocity, int ownerId, ClientWorld world) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client == null || client.player == null) {
@@ -192,7 +180,6 @@ public class PotDetectionManager {
         PlayerEntity thrower = null;
         long now = System.currentTimeMillis();
 
-        // 1. Direct projectile owner entity data
         if (ownerId > 0) {
             Entity owner = world.getEntityById(ownerId);
             if (owner instanceof PlayerEntity player) {
@@ -200,7 +187,6 @@ public class PotDetectionManager {
             }
         }
 
-        // 2. Local player right-click verification (did local player throw?)
         boolean localPlayerThrew = (now - lastLocalPlayerThrowTime < 500) && (client.player.squaredDistanceTo(px, py, pz) < 16.0);
 
         UUID oppUuid = combatManager.getCurrentActiveOpponent();
@@ -208,7 +194,7 @@ public class PotDetectionManager {
 
         if (thrower == null) {
             if (opp != null) {
-                // In 1v1 duel against active opponent:
+
                 if (localPlayerThrew) {
                     thrower = client.player;
                 } else {
@@ -227,7 +213,7 @@ public class PotDetectionManager {
                     }
                 }
             } else {
-                // Fallback for multi-player / FFA:
+
                 if (localPlayerThrew) {
                     thrower = client.player;
                 } else {
@@ -236,7 +222,7 @@ public class PotDetectionManager {
 
                     for (PlayerEntity p : world.getPlayers()) {
                         double distSq = p.squaredDistanceTo(px, py, pz);
-                        if (distSq > 36.0) continue; // within 6 blocks
+                        if (distSq > 36.0) continue;
 
                         double score = 10.0 - Math.sqrt(distSq);
 
@@ -277,7 +263,6 @@ public class PotDetectionManager {
         CounterMode mode = config.getCounterMode();
         UUID activeOpponent = combatManager.getCurrentActiveOpponent();
 
-        // In SINGLE mode, never count strangers!
         if (mode == CounterMode.SINGLE && !isLocalPlayer) {
             if (activeOpponent == null || !activeOpponent.equals(throwerUuid)) {
                 return;
@@ -287,7 +272,6 @@ public class PotDetectionManager {
         potTracker.updatePlayerName(throwerUuid, throwerName);
         potTracker.recordPot(throwerUuid, localUuid);
 
-        // Sound plays ONLY when opponent throws pot
         if (!isLocalPlayer && (activeOpponent != null && activeOpponent.equals(throwerUuid))) {
             soundManager.playPotSound();
         }
@@ -299,7 +283,6 @@ public class PotDetectionManager {
         long now = System.currentTimeMillis();
         playerArmSwingTimes.entrySet().removeIf(entry -> now - entry.getValue() > 2000);
 
-        // Discard expired pending potions without counting them blindly!
         pendingPotions.entrySet().removeIf(entry -> now - entry.getValue().timestamp > 1500);
 
         if (processedPotionEntityIds.size() > 500) {

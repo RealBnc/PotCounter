@@ -36,7 +36,7 @@ public abstract class PlayerEntityRendererMixin {
 
         Entity serverNametag = NametagHelper.findServerNametagEntity(player);
         if (serverNametag != null) {
-            // Suppress vanilla overlapping belowName score (14❤) when server uses custom TextDisplay
+
             ci.cancel();
         }
     }
@@ -81,7 +81,7 @@ public abstract class PlayerEntityRendererMixin {
 
         PotTracker.CachedPlayerData data = tracker.getCachedData(player.getUuid());
         if (data == null || data.getCount() <= 0 || data.getSuffixText() == null) {
-            return text; // Do not append -0, start directly at -1
+            return text;
         }
 
         if (MarkerHelper.hasMarker(text)) return text;
