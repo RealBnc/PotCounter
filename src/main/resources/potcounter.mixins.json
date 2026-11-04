@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.potcounter.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+  ],
+  "client": [
+    "ClientPlayNetworkHandlerMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "LivingEntityMixin",
+    "TextDisplayEntityRendererMixin",
+    "PlayerEntityRendererMixin",
+    "ArmorStandEntityRendererMixin"
+  ]
+}
